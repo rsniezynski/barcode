@@ -1,7 +1,7 @@
 package datamatrix
 
 import (
-	"github.com/boombuler/barcode/utils"
+	"github.com/rsniezynski/barcode/utils"
 )
 
 type errorCorrection struct {

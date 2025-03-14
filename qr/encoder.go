@@ -4,8 +4,8 @@ package qr
 import (
 	"image"
 
-	"github.com/boombuler/barcode"
-	"github.com/boombuler/barcode/utils"
+	"github.com/rsniezynski/barcode"
+	"github.com/rsniezynski/barcode/utils"
 )
 
 type encodeFn func(content string, eccLevel ErrorCorrectionLevel) (*utils.BitList, *versionInfo, error)

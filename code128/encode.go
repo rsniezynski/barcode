@@ -6,8 +6,8 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/boombuler/barcode"
-	"github.com/boombuler/barcode/utils"
+	"github.com/rsniezynski/barcode"
+	"github.com/rsniezynski/barcode/utils"
 )
 
 func strToRunes(str string) []rune {
@@ -66,11 +66,21 @@ func shouldUseATable(nextRunes []rune, curEncoding byte) bool {
 	return false
 }
 
-func getCodeIndexList(content []rune) *utils.BitList {
+func getCodeIndexList(table string, content []rune) *utils.BitList {
 	result := new(utils.BitList)
 	curEncoding := byte(0)
+	originalTable := table
 	for i := 0; i < len(content); i++ {
-		if shouldUseCTable(content[i:], curEncoding) {
+		if originalTable == "" {
+			if shouldUseCTable(content[i:], curEncoding) {
+				table = "c"
+			} else if shouldUseATable(content[i:], curEncoding) {
+				table = "a"
+			} else {
+				table = "b"
+			}
+		}
+		if table == "c" {
 			if curEncoding != startCSymbol {
 				if curEncoding == byte(0) {
 					result.AddByte(startCSymbol)
@@ -87,7 +97,7 @@ func getCodeIndexList(content []rune) *utils.BitList {
 				idx = idx + (content[i] - '0')
 				result.AddByte(byte(idx))
 			}
-		} else if shouldUseATable(content[i:], curEncoding) {
+		} else if table == "a" {
 			if curEncoding != startASymbol {
 				if curEncoding == byte(0) {
 					result.AddByte(startASymbol)
@@ -156,12 +166,12 @@ func getCodeIndexList(content []rune) *utils.BitList {
 }
 
 // Encode creates a Code 128 barcode for the given content and color scheme
-func EncodeWithColor(content string, color barcode.ColorScheme) (barcode.BarcodeIntCS, error) {
+func EncodeWithColor(content string, color barcode.ColorScheme, table string) (barcode.BarcodeIntCS, error) {
 	contentRunes := strToRunes(content)
 	if len(contentRunes) <= 0 || len(contentRunes) > 80 {
 		return nil, fmt.Errorf("content length should be between 1 and 80 runes but got %d", len(contentRunes))
 	}
-	idxList := getCodeIndexList(contentRunes)
+	idxList := getCodeIndexList(table, contentRunes)
 
 	if idxList == nil {
 		return nil, fmt.Errorf("\"%s\" could not be encoded", content)
@@ -184,20 +194,20 @@ func EncodeWithColor(content string, color barcode.ColorScheme) (barcode.Barcode
 }
 
 // Encode creates a Code 128 barcode for the given content
-func Encode(content string) (barcode.BarcodeIntCS, error) {
-	return EncodeWithColor(content, barcode.ColorScheme16)
+func Encode(content string, table string) (barcode.BarcodeIntCS, error) {
+	return EncodeWithColor(content, barcode.ColorScheme16, table)
 }
 
-func EncodeWithoutChecksum(content string) (barcode.Barcode, error) {
-	return EncodeWithoutChecksumWithColor(content, barcode.ColorScheme16)
+func EncodeWithoutChecksum(content string, table string) (barcode.Barcode, error) {
+	return EncodeWithoutChecksumWithColor(content, barcode.ColorScheme16, table)
 }
 
-func EncodeWithoutChecksumWithColor(content string, color barcode.ColorScheme) (barcode.Barcode, error) {
+func EncodeWithoutChecksumWithColor(content string, color barcode.ColorScheme, table string) (barcode.Barcode, error) {
 	contentRunes := strToRunes(content)
 	if len(contentRunes) <= 0 || len(contentRunes) > 80 {
 		return nil, fmt.Errorf("content length should be between 1 and 80 runes but got %d", len(contentRunes))
 	}
-	idxList := getCodeIndexList(contentRunes)
+	idxList := getCodeIndexList(table, contentRunes)
 
 	if idxList == nil {
 		return nil, fmt.Errorf("\"%s\" could not be encoded", content)

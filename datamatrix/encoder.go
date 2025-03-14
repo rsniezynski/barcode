@@ -4,7 +4,7 @@ package datamatrix
 import (
 	"errors"
 
-	"github.com/boombuler/barcode"
+	"github.com/rsniezynski/barcode"
 )
 
 // Encode returns a Datamatrix barcode for the given content and color scheme

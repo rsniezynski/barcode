@@ -5,8 +5,8 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/boombuler/barcode"
-	"github.com/boombuler/barcode/utils"
+	"github.com/rsniezynski/barcode"
+	"github.com/rsniezynski/barcode/utils"
 )
 
 type encodeInfo struct {
